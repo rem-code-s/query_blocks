@@ -1,6 +1,6 @@
 use candid::{CandidType, Deserialize, Nat};
 use ic_agent::{identity::Secp256k1Identity, Agent, AgentError};
-use ic_utils::Canister;
+use ic_utils::{call::SyncCall, Canister};
 use rust_call_example::types::GetBlocksResponse;
 
 #[derive(CandidType, Deserialize)]
@@ -26,13 +26,13 @@ async fn get_data() -> () {
         .expect("failed to create canister");
 
     let call: Result<(GetBlocksResponse,), AgentError> = canister
-        .update("get_blocks")
+        .query("get_blocks")
         .with_arg(Args {
             start: Nat::from(316000), // <------------------
             length: Nat::from(10),    // <------------------
         })
-        .build::<(GetBlocksResponse,)>() // expected type as icc format (trailing comma)
-        .call_and_wait()
+        .build::<(GetBlocksResponse,)>()
+        .call()
         .await;
 
     println!("Response: {:?}", call);
