@@ -1,7 +1,7 @@
 use candid::{CandidType, Deserialize, Nat};
 use ic_agent::{identity::Secp256k1Identity, Agent, AgentError};
 use ic_utils::{call::SyncCall, Canister};
-use rust_call_example::types::GetBlocksResponse;
+use rust_call_example::types::{GetBlocksResponse, GetTransactionsResponse};
 
 #[derive(CandidType, Deserialize)]
 struct Args {
@@ -25,17 +25,19 @@ async fn get_data() -> () {
         .build()
         .expect("failed to create canister");
 
-    let call: Result<(GetBlocksResponse,), AgentError> = canister
-        .query("get_blocks")
+    let call: Result<(GetTransactionsResponse,), AgentError> = canister
+        .query("get_transactions")
         .with_arg(Args {
-            start: Nat::from(316000), // <------------------
-            length: Nat::from(10),    // <------------------
+            start: Nat::from(316000),  // <------------------
+            length: Nat::from(317065), // <------------------
         })
-        .build::<(GetBlocksResponse,)>()
+        .build::<(GetTransactionsResponse,)>()
         .call()
         .await;
 
-    println!("Response: {:?}", call);
+    call.unwrap().0.transactions.iter().for_each(|t| {
+        println!("Transaction: {:?}", t);
+    });
 }
 
 #[tokio::main]

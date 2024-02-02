@@ -3,7 +3,7 @@
 #![allow(dead_code, unused_imports)]
 use candid::{self, CandidType, Decode, Deserialize, Encode, Principal};
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct GetBlocksRequest {
     pub start: candid::Nat,
     pub length: candid::Nat,
@@ -31,7 +31,7 @@ pub enum Value {
     Array(Box<Vec<VecItem>>),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct ArchivedRangeCallbackRet {
     pub blocks: Vec<Box<Value>>,
 }
@@ -55,19 +55,19 @@ pub struct GetBlocksResponse {
     pub archived_blocks: Vec<ArchivedRange>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct DataCertificate {
     pub certificate: Option<Vec<u8>>,
     pub hash_tree: Vec<u8>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Account {
     pub owner: Principal,
     pub subaccount: Option<Vec<u8>>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Burn {
     pub from: Account,
     pub memo: Option<Vec<u8>>,
@@ -76,7 +76,7 @@ pub struct Burn {
     pub spender: Option<Account>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Mint {
     pub to: Account,
     pub memo: Option<Vec<u8>>,
@@ -84,7 +84,7 @@ pub struct Mint {
     pub amount: candid::Nat,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Approve {
     pub fee: Option<candid::Nat>,
     pub from: Account,
@@ -96,7 +96,7 @@ pub struct Approve {
     pub spender: Account,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Transfer {
     pub to: Account,
     pub fee: Option<candid::Nat>,
@@ -107,7 +107,7 @@ pub struct Transfer {
     pub spender: Option<Account>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Transaction {
     pub burn: Option<Burn>,
     pub kind: String,
@@ -117,7 +117,7 @@ pub struct Transaction {
     pub transfer: Option<Transfer>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct ArchivedRange1CallbackRet {
     pub transactions: Vec<Transaction>,
 }
@@ -125,14 +125,14 @@ pub struct ArchivedRange1CallbackRet {
 candid::define_function!(pub ArchivedRange1Callback : (GetBlocksRequest) -> (
     ArchivedRange1CallbackRet,
   ) query);
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct ArchivedRange1 {
     pub callback: ArchivedRange1Callback,
     pub start: candid::Nat,
     pub length: candid::Nat,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct GetTransactionsResponse {
     pub first_index: candid::Nat,
     pub log_length: candid::Nat,
@@ -140,7 +140,7 @@ pub struct GetTransactionsResponse {
     pub archived_transactions: Vec<ArchivedRange1>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct HttpRequest {
     pub url: String,
     pub method: String,
@@ -148,14 +148,14 @@ pub struct HttpRequest {
     pub headers: Vec<(String, String)>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct HttpResponse {
     pub body: Vec<u8>,
     pub headers: Vec<(String, String)>,
     pub status_code: u16,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum MetadataValue {
     Int(candid::Int),
     Nat(candid::Nat),
@@ -163,13 +163,13 @@ pub enum MetadataValue {
     Text(String),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct StandardRecord {
     pub url: String,
     pub name: String,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct TransferArg {
     pub to: Account,
     pub fee: Option<candid::Nat>,
@@ -179,7 +179,7 @@ pub struct TransferArg {
     pub amount: candid::Nat,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum TransferError {
     GenericError {
         message: String,
@@ -204,25 +204,25 @@ pub enum TransferError {
     },
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum Result_ {
     Ok(candid::Nat),
     Err(TransferError),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct AllowanceArgs {
     pub account: Account,
     pub spender: Account,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct Allowance {
     pub allowance: candid::Nat,
     pub expires_at: Option<u64>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct ApproveArgs {
     pub fee: Option<candid::Nat>,
     pub memo: Option<Vec<u8>>,
@@ -234,7 +234,7 @@ pub struct ApproveArgs {
     pub spender: Account,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum ApproveError {
     GenericError {
         message: String,
@@ -262,13 +262,13 @@ pub enum ApproveError {
     },
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum Result1 {
     Ok(candid::Nat),
     Err(ApproveError),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct TransferFromArgs {
     pub to: Account,
     pub fee: Option<candid::Nat>,
@@ -279,7 +279,7 @@ pub struct TransferFromArgs {
     pub amount: candid::Nat,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum TransferFromError {
     GenericError {
         message: String,
@@ -307,7 +307,7 @@ pub enum TransferFromError {
     },
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub enum Result2 {
     Ok(candid::Nat),
     Err(TransferFromError),
