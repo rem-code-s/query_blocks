@@ -126,6 +126,12 @@ pub async fn get_accounts() -> Vec<Account> {
             accounts.insert(data.to.owner, data.to);
             accounts.insert(data.from.owner, data.from);
         }
+        // dont think this is needed
+        if let Some(data) = transaction.burn {
+            accounts.insert(data.from.owner, data.from);
+            data.spender
+                .map(|spender| accounts.insert(spender.owner, spender));
+        }
     }
 
     accounts
