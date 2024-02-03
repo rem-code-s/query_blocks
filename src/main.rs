@@ -4,4 +4,7 @@ use rust_call_example::logic::get_principals;
 async fn main() {
     let principals = get_principals().await;
     println!("{:?}", principals.len());
+    for p in principals {
+        println!("{:?}", p);
+    }
 }

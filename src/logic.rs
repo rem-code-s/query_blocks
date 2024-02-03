@@ -39,8 +39,8 @@ pub async fn get_transactions() -> Vec<Transaction> {
     let call: Result<(GetTransactionsResponse,), AgentError> = canister
         .query("get_transactions")
         .with_arg(Args {
-            start: Nat::from(0),
-            length: Nat::from(317311),
+            start: Nat::from(1),
+            length: Nat::from(1000000000),
         })
         .build::<(GetTransactionsResponse,)>()
         .call()
