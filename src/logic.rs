@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use async_recursion::async_recursion;
 use candid::{CandidType, Deserialize, Nat, Principal};
 use ic_agent::{Agent, AgentError};
 use ic_utils::{call::SyncCall, Canister};
@@ -17,7 +18,12 @@ struct TransactionResult {
     transactions: Vec<Transaction>,
 }
 
+pub static LEDGER_CANISTER_ID: &str = "zfcdd-tqaaa-aaaaq-aaaga-cai";
+
+#[async_recursion]
 pub async fn get_transactions() -> Vec<Transaction> {
+    let mut transactions: Vec<Transaction> = vec![];
+
     let agent = Agent::builder()
         .with_url("https://icp0.io")
         .build()
@@ -26,7 +32,6 @@ pub async fn get_transactions() -> Vec<Transaction> {
     let canister = Canister::<'_>::builder()
         .with_agent(&agent)
         .with_canister_id("zfcdd-tqaaa-aaaaq-aaaga-cai") // ledger
-        // .with_canister_id("zmbi7-fyaaa-aaaaq-aaahq-cai") // archive
         .build()
         .expect("failed to create canister");
 
@@ -34,14 +39,63 @@ pub async fn get_transactions() -> Vec<Transaction> {
     let call: Result<(GetTransactionsResponse,), AgentError> = canister
         .query("get_transactions")
         .with_arg(Args {
-            start: Nat::from(316000),
+            start: Nat::from(0),
             length: Nat::from(317311),
         })
         .build::<(GetTransactionsResponse,)>()
         .call()
         .await;
 
-    call.unwrap().0.transactions.into_iter().collect()
+    let data = call.unwrap().0;
+    let archived = data.archived_transactions;
+    let not_archived_transactions = data.transactions;
+
+    for t in archived {
+        let callback_transactions = get_callback_transactions(
+            t.callback.0.principal.to_string().as_str(),
+            t.callback.0.method.as_str(),
+            Args {
+                start: t.start,
+                length: t.length,
+            },
+        )
+        .await;
+
+        for t in callback_transactions {
+            transactions.push(t);
+        }
+    }
+
+    for t in not_archived_transactions {
+        transactions.push(t);
+    }
+
+    transactions
+}
+
+async fn get_callback_transactions(principal: &str, method: &str, args: Args) -> Vec<Transaction> {
+    let agent = Agent::builder()
+        .with_url("https://icp0.io")
+        .build()
+        .expect("failed to create agent");
+
+    let canister = Canister::<'_>::builder()
+        .with_agent(&agent)
+        .with_canister_id(principal) // ledger
+        .build()
+        .expect("failed to create canister");
+
+    // ledger
+    let call: Result<(TransactionResult,), AgentError> = canister
+        .query(method)
+        .with_arg(args)
+        .build::<(TransactionResult,)>()
+        .call()
+        .await;
+
+    let data = call.unwrap().0;
+
+    data.transactions
 
     // archive
     // let call: Result<(TransactionResult,), AgentError> = canister
